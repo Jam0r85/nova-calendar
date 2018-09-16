@@ -1,5 +1,5 @@
 {
-    "name": "jam0r85/nova-calendar",
+    "name": "Jam0r85/nova-calendar",
     "description": "Calendar for nova",
     "keywords": [
         "laravel",
@@ -11,7 +11,7 @@
             "url": "../laravel-nova"
         }
     ],
-    "homepage": "https://github.com/jam0r85/nova-calendar",
+    "homepage": "https://github.com/Jam0r85/nova-calendar",
     "license": "MIT",
     "authors": [
         {
