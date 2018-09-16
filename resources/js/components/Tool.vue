@@ -1,30 +1,275 @@
 <template>
     <div>
-        <heading class="mb-6">{{ title }}</heading>
 
-        <card class="bg-90 flex flex-col items-center justify-center" style="min-height: 300px">
-            <svg class="spin fill-80 mb-6" width="69" height="72" viewBox="0 0 23 24" xmlns="http://www.w3.org/2000/svg"><path d="M20.12 20.455A12.184 12.184 0 0 1 11.5 24a12.18 12.18 0 0 1-9.333-4.319c4.772 3.933 11.88 3.687 16.36-.738a7.571 7.571 0 0 0 0-10.8c-3.018-2.982-7.912-2.982-10.931 0a3.245 3.245 0 0 0 0 4.628 3.342 3.342 0 0 0 4.685 0 1.114 1.114 0 0 1 1.561 0 1.082 1.082 0 0 1 0 1.543 5.57 5.57 0 0 1-7.808 0 5.408 5.408 0 0 1 0-7.714c3.881-3.834 10.174-3.834 14.055 0a9.734 9.734 0 0 1 .03 13.855zM4.472 5.057a7.571 7.571 0 0 0 0 10.8c3.018 2.982 7.912 2.982 10.931 0a3.245 3.245 0 0 0 0-4.628 3.342 3.342 0 0 0-4.685 0 1.114 1.114 0 0 1-1.561 0 1.082 1.082 0 0 1 0-1.543 5.57 5.57 0 0 1 7.808 0 5.408 5.408 0 0 1 0 7.714c-3.881 3.834-10.174 3.834-14.055 0a9.734 9.734 0 0 1-.015-13.87C5.096 1.35 8.138 0 11.5 0c3.75 0 7.105 1.68 9.333 4.319C16.06.386 8.953.632 4.473 5.057z" fill-rule="evenodd"/></svg>
+        <!-- Event Details Form -->
+        <div v-if="showingForm">
 
-            <h1 class="text-white text-4xl text-90 font-light mb-6">
-                We're in a black hole.
-            </h1>
+            <heading class="mb-6">
+                {{__('Appointment Details')}}
+            </heading>
 
-            <p class="text-white-50% text-lg">
-                You can edit this tool's component at:
-                <code class="ml-1 border border-80 text-sm font-mono text-white bg-black rounded px-2 py-1">/nova-tools/{{ class }}/resources/js/components/Tool.vue</code>
-            </p>
+            <card class="mb-6">
+
+                <!-- Start -->
+                <field-wrapper>
+                    <div class="w-1/5 px-8 py-6">
+                        <form-label>
+                            {{__('Start')}}
+                        </form-label>
+                    </div>
+                    <div class="w-1/2 px-8 py-6">
+                        <input
+                            type="text"
+                            v-model="start"
+                            disabled
+                            required
+                            class="w-full form-control form-input form-input-bordered"
+                        />
+                    </div>
+                </field-wrapper>
+
+                <!-- Length -->
+                <field-wrapper>
+                    <div class="w-1/5 px-8 py-6">
+                        <form-label>
+                            {{__('Length')}}
+                        </form-label>
+                    </div>
+                    <div class="w-1/2 px-8 py-6">
+                        <select class="w-full form-control form-select"
+                            v-model="length"
+                            v-on:change="setEnd">
+                            <option value="15">15 Minutes</option>
+                            <option value="30">30 Minutes</option>
+                            <option value="45">45 Minutes</option>
+                            <option value="60">1 Hour</option>
+                            <option value="all">All Day</option>
+                        </select>
+                    </div>
+                </field-wrapper>
+
+                <!-- End -->
+                <field-wrapper>
+                    <div class="w-1/5 px-8 py-6">
+                        <form-label>
+                            {{__('End')}}
+                        </form-label>
+                    </div>
+                    <div class="w-1/2 px-8 py-6">
+                        <input
+                            type="text"
+                            v-model="end"
+                            disabled
+                            required
+                            class="w-full form-control form-input form-input-bordered"
+                        />
+                    </div>
+                </field-wrapper>
+
+                <!-- Title -->
+                <field-wrapper>
+                    <div class="w-1/5 px-8 py-6">
+                        <form-label>
+                            {{__('Title')}}
+                        </form-label>
+                    </div>
+                    <div class="w-1/2 px-8 py-6">
+                        <input
+                            type="text"
+                            v-model="title"
+                            required
+                            class="w-full form-control form-input form-input-bordered"
+                        />
+                    </div>
+                </field-wrapper>
+
+                <!-- Description -->
+                <field-wrapper>
+                    <div class="w-1/5 px-8 py-6">
+                        <form-label>
+                            {{__('Description')}}
+                        </form-label>
+                    </div>
+                    <div class="w-1/2 px-8 py-6">
+                        <textarea
+                            type="text"
+                            v-model="description"
+                            class="w-full form-control form-input form-input-bordered py-3 min-h-textarea"
+                        />
+                    </div>
+                </field-wrapper>
+
+                <div class="bg-30 flex px-8 py-4">
+                    <button class="btn btn-default btn-danger mr-3" v-if="appointment_id" @click="deleteAppointment" >
+                        Delete Appointment
+                    </button>
+                    <div class="flex-1 text-right">
+                        <button class="btn btn-default btn-danger mr-3" @click="hideForm">
+                            Cancel
+                        </button>
+                        <button class="btn btn-default btn-primary" @click="store">
+                            {{ formLabel }} Appointment
+                        </button>
+                    </div>
+                </div>
+
+            </card>
+        </div>
+
+        <heading class="mb-6">{{__('Calendar')}}</heading>
+
+        <card class="p-4">
+            <full-calendar :config="config"
+                :events="events"
+                @day-click="dayClicked"
+                @event-selected="eventClicked">
+            </full-calendar>
         </card>
+
     </div>
 </template>
 
 <script>
-    export default {
-        mounted() {
-            //
+import { FullCalendar } from 'vue-full-calendar';
+import 'fullcalendar/dist/fullcalendar.css';
+
+export default {
+    components: {
+        FullCalendar
+    },
+
+    data() {
+        return {
+            showingForm: false,
+            formLabel: null,
+
+            appointment_id: '',
+            title: '',
+            description: '',
+            start: '',
+            end: '',
+            all_day: false,
+            length: 15,
+
+            events: [],
+            config: {
+                editable: false,
+                selectHelper: false,
+                hiddenDays: [ 0 ],
+                slotDuration: '00:15:00',
+                slotLabelInterval: '01:00:00',
+                minTime: '08:00:00',
+                maxTime: '20:00:00',
+                businessHours: {
+                    dow: [1, 2, 3, 4, 5],
+                    start: '09:00',
+                    end: '18:00'
+                }
+            }
+        }
+    },
+
+    mounted() {
+        this.loadAppointments();
+    },
+
+    methods: {
+
+        loadAppointments() {
+            this.getGeneral();
         },
+
+        getGeneral() {
+            Nova.request().get('/nova-vendor/nova-calendar/general').then(response => {
+                this.events = response.data;
+            })
+        },
+
+        showForm(label) {
+            this.showingForm = true;
+            this.formLabel = label;
+            this.resetForm();
+        },
+
+        hideForm() {
+            this.showingForm = false;
+            this.resetForm()
+        },
+
+        resetForm() {
+            this.title = '';
+            this.description = '';
+            this.start = '';
+            this.length = 15;
+        },
+
+        setEnd() {
+            this.all_day = false;
+
+            if (this.length != 'all') {
+                this.end = moment(this.start).add(this.length, 'm');
+            } else {
+                this.all_day = true;
+                this.end = null;
+            }
+        },
+
+        dayClicked(date, jsEvent, view) {
+            if (! this.appointment_id) {
+                this.showForm('Create');
+            }
+
+            this.start = date;
+
+            this.setEnd();
+        },
+
+        eventClicked(event, jsEvent, view) {
+            this.showForm('Update');
+            this.appointment_id = event.id;
+
+            Nova.request().post('/nova-vendor/nova-calendar/show', {
+                appointment_id: this.appointment_id
+            }).then(response => {
+                this.start = response.data.start;
+                this.end = response.data.end;
+                this.title = response.data.title;
+                this.description = response.data.description;
+            });
+        },
+
+        store() {
+            Nova.request().post('/nova-vendor/nova-calendar/store', {
+                appointment_id: this.appointment_id,
+                start: this.start,
+                end: this.end,
+                title: this.title,
+                description: this.description,
+                all_day: this.all_day
+            }).then(response => {
+                this.$toasted.show('Appointment stored.', { type: 'success' })
+                this.hideForm();
+                this.loadAppointments();
+            }).catch(response => {
+                this.$toasted.show('There was an error :(', {type: 'error'});
+            });
+        },
+
+        deleteAppointment() {
+            Nova.request().post('/nova-vendor/nova-calendar/delete', {
+                appointment_id: this.appointment_id,
+            }).then(response => {
+                this.$toasted.show('Appointment deleted.', { type: 'success' })
+                this.hideForm();
+                this.loadAppointments();
+            }).catch(response => {
+                this.$toasted.show('There was an error :(', {type: 'error'});
+            });
+        }
     }
+}
 </script>
 
 <style>
-    /* Scoped Styles */
+    
 </style>

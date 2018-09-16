@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Jam0r85\NovaCalendar\Http\Controllers\AppointmentController;
 
 /*
 |--------------------------------------------------------------------------
@@ -13,4 +14,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('endpoint', \Jam0r85\NovaCalendar\Http\Controllers\ToolController::class . '@index');
+Route::post('/store', AppointmentController::class.'@store');
+Route::get('/general', AppointmentController::class.'@general');
+Route::post('/show', AppointmentController::class.'@show');
+Route::post('/delete', AppointmentController::class.'@destroy');
